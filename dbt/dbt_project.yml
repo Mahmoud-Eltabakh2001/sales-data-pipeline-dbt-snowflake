@@ -1,0 +1,21 @@
+name: 'snowflake_data_project'
+version: '1.0.0'
+profile: 'finance_project'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  snowflake_data_project:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

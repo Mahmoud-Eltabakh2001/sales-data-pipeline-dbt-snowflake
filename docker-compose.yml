@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: airflow-dbt
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__LOGGING__REMOTE_LOGGING: 'False'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./dbt:/opt/airflow/dbt
+      - ./airflow_cfg:/opt/airflow/config
+    ports:
+      - "8081:8080"
+      - "8082:8082"
+    command: webserver
+
+  airflow-scheduler:
+    image: airflow-dbt
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__LOGGING__REMOTE_LOGGING: 'False'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./dbt:/opt/airflow/dbt
+      - ./airflow_cfg:/opt/airflow/config
+    command: scheduler
+
+  airflow-worker:
+    image: airflow-dbt
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__LOGGING__REMOTE_LOGGING: 'False'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./dbt:/opt/airflow/dbt
+      - ./airflow_cfg:/opt/airflow/config
+    command: celery worker
+
+  airflow-init:
+    image: airflow-dbt
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    entrypoint: >
+      bash -c "
+        airflow db upgrade &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+      "
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./dbt:/opt/airflow/dbt
+      - ./airflow_cfg:/opt/airflow/config
+
+  flower:
+    image: airflow-dbt
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    command: celery flower
+    ports:
+      - "5555:5555"
+
+volumes:
+  postgres_data:
+

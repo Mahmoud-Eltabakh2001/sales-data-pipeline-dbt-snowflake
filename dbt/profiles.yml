@@ -1,0 +1,16 @@
+finance_project:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: vx12700.me-central2.gcp
+      user: dbt_user
+      password: dbt_password
+      role: ACCOUNTADMIN
+      database: finance_db
+      warehouse: finance_dwh
+      schema: raw
+      threads: 1
+      client_session_keep_alive: False
+
+
