@@ -1,6 +1,8 @@
 
 # 🚀 Modern Data Engineering Project with Snowflake, dbt, Airflow, Power BI & Docker
 
+![Dashboard Preview](Img/pipeline.png)
+
 ## 📌 Overview
 
 This project demonstrates a modern **Data Engineering** pipeline using:
