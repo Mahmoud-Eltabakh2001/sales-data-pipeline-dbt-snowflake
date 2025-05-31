@@ -127,7 +127,6 @@ docker-compose up
 ```
 
 Access Airflow UI at: [http://localhost:8081](http://localhost:8081)  
-Access Flower UI at: [http://localhost:5555](http://localhost:5555)
 
 ---
 
